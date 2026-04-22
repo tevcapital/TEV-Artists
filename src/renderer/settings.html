@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TEV Artists Settings</title>
+    <style>
+      :root {
+        --bg: #f2f6fb;
+        --card: #fff;
+        --ink: #132741;
+        --muted: #637892;
+        --line: #d5dfeb;
+        --accent: #1f6eff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "SF Pro Text", "Helvetica Neue", sans-serif;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      h1 { margin: 0 0 16px; font-size: 20px; }
+      .row { margin-bottom: 14px; }
+      label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+      input, select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--ink);
+      }
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23637892' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+      }
+      .toggle-row { display: flex; gap: 8px; margin-bottom: 18px; }
+      .toggle-btn {
+        flex: 1;
+        padding: 9px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+      .section { display: none; }
+      .section.visible { display: block; }
+      .section-copy {
+        margin: 0 0 16px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+      .provider-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .radio-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .radio-pill input {
+        width: auto;
+        margin: 0;
+      }
+      .provider-block {
+        margin-bottom: 16px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+      .provider-title {
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .frontier-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-left: 6px;
+        border-radius: 999px;
+        background: #d45555;
+        vertical-align: middle;
+      }
+      button#saveBtn {
+        margin-top: 4px;
+        border: 1px solid var(--accent);
+        background: var(--accent);
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .hint { margin-top: 10px; font-size: 12px; color: var(--muted); }
+      #status { margin-left: 10px; font-size: 12px; color: #0f9a63; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>TEV Artists Settings</h1>
+
+      <div class="toggle-row">
+        <button class="toggle-btn" id="btnOpenLLMs" onclick="setMode('openllms')">Open LLMs</button>
+        <button class="toggle-btn" id="btnOllama" onclick="setMode('ollama')">Ollama</button>
+        <button class="toggle-btn" id="btnFrontier" onclick="setMode('frontier')">Frontier<span class="frontier-dot"></span></button>
+      </div>
+
+      <div class="section" id="sectionOpenLLMs">
+        <p class="section-copy">Fast, cheap inference for open-weight models.</p>
+
+        <div class="row">
+          <label>Active Provider</label>
+          <div class="provider-toggle">
+            <label class="radio-pill"><input type="radio" name="activeOpenLLMProvider" value="groq" /> Groq</label>
+            <label class="radio-pill"><input type="radio" name="activeOpenLLMProvider" value="openrouter" /> OpenRouter</label>
+          </div>
+        </div>
+
+        <div class="provider-block">
+          <div class="provider-title">Groq</div>
+          <div class="row">
+            <label for="groqApiKey">Groq API Key</label>
+            <input id="groqApiKey" type="password" placeholder="gsk_..." />
+          </div>
+          <div class="row">
+            <label for="groqModel">Groq Model</label>
+            <select id="groqModel"></select>
+            <input id="groqCustomModelInput" type="text" placeholder="Enter custom Groq model ID" style="display: none; margin-top: 8px;" />
+          </div>
+        </div>
+
+        <div class="provider-block">
+          <div class="provider-title">OpenRouter</div>
+          <div class="row">
+            <label for="openrouterApiKey">OpenRouter API Key</label>
+            <input id="openrouterApiKey" type="password" placeholder="sk-or-..." />
+          </div>
+          <div class="row">
+            <label for="openrouterModel">OpenRouter Model</label>
+            <select id="openrouterModel">
+              <optgroup label="Recommended (free)">
+                <option value="meta-llama/llama-3.3-70b-instruct:free">llama-3.3-70b</option>
+                <option value="openai/gpt-oss-120b:free">gpt-oss-120b</option>
+                <option value="mistralai/mistral-small-3.1-24b-instruct:free">mistral-small-3.1-24b</option>
+              </optgroup>
+              <optgroup label="Qwen (free)">
+                <option value="qwen/qwen3-4b:free">qwen3-4b</option>
+                <option value="qwen/qwen3-coder:free">qwen3-coder</option>
+              </optgroup>
+              <optgroup label="Google (free)">
+                <option value="google/gemma-3-12b-it:free">gemma-3-12b</option>
+                <option value="google/gemma-3-27b-it:free">gemma-3-27b</option>
+              </optgroup>
+              <optgroup label="Nvidia (free)">
+                <option value="nvidia/nemotron-nano-12b-v2:free">nemotron-12b</option>
+                <option value="nvidia/nemotron-3-nano-30b-a3b:free">nemotron-30b</option>
+              </optgroup>
+              <option value="custom">Custom...</option>
+            </select>
+            <input id="openrouterCustomModelInput" type="text" placeholder="Enter custom OpenRouter model ID" style="display: none; margin-top: 8px;" />
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="sectionOllama">
+        <p class="section-copy">Local models running on your machine.</p>
+
+        <div class="row">
+          <label for="ollamaUrl">Ollama URL</label>
+          <input id="ollamaUrl" type="text" placeholder="http://localhost:11434" />
+        </div>
+        <div class="row">
+          <label for="ollamaModel">Model</label>
+          <select id="ollamaModel"></select>
+        </div>
+      </div>
+
+      <div class="section" id="sectionFrontier">
+        <p class="section-copy">Premium quality. Costs real money per call.</p>
+
+        <div class="row">
+          <label>Active Provider</label>
+          <div class="provider-toggle">
+            <label class="radio-pill"><input type="radio" name="activeFrontierProvider" value="anthropic" /> Anthropic</label>
+            <label class="radio-pill"><input type="radio" name="activeFrontierProvider" value="openai" /> OpenAI</label>
+          </div>
+        </div>
+
+        <div class="provider-block">
+          <div class="provider-title">Anthropic</div>
+          <div class="row">
+            <label for="anthropicApiKey">Anthropic API Key</label>
+            <input id="anthropicApiKey" type="password" placeholder="sk-ant-..." />
+          </div>
+          <div class="row">
+            <label for="anthropicModel">Anthropic Model</label>
+            <select id="anthropicModel">
+              <option value="claude-opus-4-7">claude-opus-4-7</option>
+              <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+              <option value="claude-haiku-4-5">claude-haiku-4-5</option>
+              <option value="custom">Custom...</option>
+            </select>
+            <input id="anthropicCustomModelInput" type="text" placeholder="Enter custom Anthropic model ID (e.g. claude-opus-5)" style="display: none; margin-top: 8px;" />
+          </div>
+        </div>
+
+        <div class="provider-block">
+          <div class="provider-title">OpenAI</div>
+          <div class="row">
+            <label for="openaiApiKey">OpenAI API Key</label>
+            <input id="openaiApiKey" type="password" placeholder="sk-..." />
+          </div>
+          <div class="row">
+            <label for="openaiModel">OpenAI Model</label>
+            <select id="openaiModel">
+              <option value="gpt-5.4">gpt-5.4</option>
+              <option value="gpt-5.4-mini">gpt-5.4-mini</option>
+              <option value="gpt-4o">gpt-4o</option>
+              <option value="custom">Custom...</option>
+            </select>
+            <input id="openaiCustomModelInput" type="text" placeholder="Enter custom OpenAI model ID (e.g. gpt-6)" style="display: none; margin-top: 8px;" />
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--line);margin:18px 0 14px;" />
+      <div class="row">
+        <label for="tavilyApiKey">Tavily API Key — Web Search (optional)</label>
+        <input id="tavilyApiKey" type="password" placeholder="tvly-..." />
+      </div>
+
+      <button id="saveBtn">Save</button><span id="status"></span>
+    </div>
+
+    <script>
+      let currentMode = 'openllms';
+      const modeIds = { openllms: 'OpenLLMs', ollama: 'Ollama', frontier: 'Frontier' };
+      const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
+      const DEFAULT_OLLAMA_MODEL = 'qwen3.5:4b';
+      const DEFAULT_OPENROUTER_MODEL = 'qwen/qwen3-4b:free';
+      const DEFAULT_ANTHROPIC_MODEL = 'claude-opus-4-7';
+      const DEFAULT_OPENAI_MODEL = 'gpt-5.4';
+      const groqModelSelect = document.getElementById('groqModel');
+      const groqApiKeyInput = document.getElementById('groqApiKey');
+      let latestSettings = null;
+      const modelFieldConfigs = [
+        { selectId: 'groqModel', inputId: 'groqCustomModelInput', defaultValue: DEFAULT_GROQ_MODEL, customKey: 'groqCustomModel' },
+        { selectId: 'openrouterModel', inputId: 'openrouterCustomModelInput', defaultValue: DEFAULT_OPENROUTER_MODEL, customKey: 'openrouterCustomModel' },
+        { selectId: 'anthropicModel', inputId: 'anthropicCustomModelInput', defaultValue: DEFAULT_ANTHROPIC_MODEL, customKey: 'anthropicCustomModel' },
+        { selectId: 'openaiModel', inputId: 'openaiCustomModelInput', defaultValue: DEFAULT_OPENAI_MODEL, customKey: 'openaiCustomModel' }
+      ];
+
+      function setMode(mode) {
+        currentMode = mode;
+        Object.entries(modeIds).forEach(([value, id]) => {
+          document.getElementById('section' + id).className = 'section' + (mode === value ? ' visible' : '');
+          document.getElementById('btn' + id).className = 'toggle-btn' + (mode === value ? ' active' : '');
+        });
+      }
+
+      function normalizeMode(settings) {
+        const mode = settings.mode || 'openllms';
+        if (mode === 'ollama') return 'ollama';
+        if (mode === 'frontier' || mode === 'anthropic' || mode === 'openai') return 'frontier';
+        return 'openllms';
+      }
+
+      function getCheckedValue(name, fallback) {
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        return checked ? checked.value : fallback;
+      }
+
+      function setCheckedValue(name, value, fallback) {
+        const target = value || fallback;
+        const input = document.querySelector(`input[name="${name}"][value="${target}"]`) ||
+          document.querySelector(`input[name="${name}"][value="${fallback}"]`);
+        if (input) input.checked = true;
+      }
+
+      function populateSelect(selectEl, values, selectedValue, labelFormatter = null) {
+        selectEl.innerHTML = '';
+        const seen = new Set();
+        const ordered = [];
+        values.forEach((value) => {
+          const normalized = String(value || '').trim();
+          if (!normalized || seen.has(normalized)) return;
+          seen.add(normalized);
+          ordered.push(normalized);
+        });
+
+        if (selectedValue && !seen.has(selectedValue)) ordered.unshift(selectedValue);
+
+        ordered.forEach((value) => {
+          const opt = document.createElement('option');
+          opt.value = value;
+          opt.textContent = labelFormatter ? labelFormatter(value) : value;
+          if (value === selectedValue) opt.selected = true;
+          selectEl.appendChild(opt);
+        });
+      }
+
+      function appendCustomOption(selectEl) {
+        if ([...selectEl.options].some((opt) => opt.value === 'custom')) return;
+        const opt = document.createElement('option');
+        opt.value = 'custom';
+        opt.textContent = 'Custom...';
+        selectEl.appendChild(opt);
+      }
+
+      function ensureSelectValue(id, value) {
+        const el = document.getElementById(id);
+        let found = false;
+        for (const opt of el.options) {
+          if (opt.value === value) {
+            opt.selected = true;
+            found = true;
+            break;
+          }
+        }
+        if (!found && value) {
+          const opt = document.createElement('option');
+          opt.value = value;
+          opt.textContent = value;
+          opt.selected = true;
+          el.appendChild(opt);
+        }
+      }
+
+      function syncCustomModelVisibility(selectEl, customInputEl) {
+        customInputEl.style.display = selectEl.value === 'custom' ? 'block' : 'none';
+      }
+
+      function wireCustomModelToggle(selectEl, customInputEl) {
+        selectEl.addEventListener('change', () => syncCustomModelVisibility(selectEl, customInputEl));
+      }
+
+      async function refreshGroqModels(selectedValue = '') {
+        const models = await window.desk.getGroqModels();
+        const nextValue = selectedValue || groqModelSelect.value || DEFAULT_GROQ_MODEL;
+        populateSelect(
+          groqModelSelect,
+          models.length ? models : [DEFAULT_GROQ_MODEL],
+          nextValue,
+          (value) => value === DEFAULT_GROQ_MODEL ? `${value} (default)` : value
+        );
+        appendCustomOption(groqModelSelect);
+        if (nextValue === 'custom') groqModelSelect.value = 'custom';
+        syncCustomModelVisibility(groqModelSelect, document.getElementById('groqCustomModelInput'));
+      }
+
+      function collectDraftSettings() {
+        return {
+          mode: currentMode,
+          groqApiKey: groqApiKeyInput.value.trim(),
+          groqModel: groqModelSelect.value || DEFAULT_GROQ_MODEL,
+          groqCustomModel: document.getElementById('groqCustomModelInput').value.trim(),
+          openrouterApiKey: document.getElementById('openrouterApiKey').value.trim(),
+          openrouterModel: document.getElementById('openrouterModel').value || DEFAULT_OPENROUTER_MODEL,
+          openrouterCustomModel: document.getElementById('openrouterCustomModelInput').value.trim(),
+          activeOpenLLMProvider: getCheckedValue('activeOpenLLMProvider', 'groq'),
+          ollamaUrl: document.getElementById('ollamaUrl').value.trim() || 'http://localhost:11434',
+          ollamaModel: document.getElementById('ollamaModel').value || DEFAULT_OLLAMA_MODEL,
+          anthropicApiKey: document.getElementById('anthropicApiKey').value.trim(),
+          anthropicModel: document.getElementById('anthropicModel').value || DEFAULT_ANTHROPIC_MODEL,
+          anthropicCustomModel: document.getElementById('anthropicCustomModelInput').value.trim(),
+          openaiApiKey: document.getElementById('openaiApiKey').value.trim(),
+          openaiModel: document.getElementById('openaiModel').value || DEFAULT_OPENAI_MODEL,
+          openaiCustomModel: document.getElementById('openaiCustomModelInput').value.trim(),
+          activeFrontierProvider: getCheckedValue('activeFrontierProvider', 'anthropic'),
+          tavilyApiKey: document.getElementById('tavilyApiKey').value.trim()
+        };
+      }
+
+      async function init() {
+        const [settings, ollamaModels] = await Promise.all([window.desk.getSettings(), window.desk.getOllamaModels()]);
+        latestSettings = settings;
+
+        const openLLMProvider = settings.mode === 'openrouter'
+          ? 'openrouter'
+          : (settings.activeOpenLLMProvider || 'groq');
+        const frontierProvider = settings.mode === 'openai'
+          ? 'openai'
+          : (settings.mode === 'anthropic' ? 'anthropic' : (settings.activeFrontierProvider || 'anthropic'));
+
+        setMode(normalizeMode(settings));
+        setCheckedValue('activeOpenLLMProvider', openLLMProvider, 'groq');
+        setCheckedValue('activeFrontierProvider', frontierProvider, 'anthropic');
+
+        groqApiKeyInput.value = settings.groqApiKey || '';
+        document.getElementById('openrouterApiKey').value = settings.openrouterApiKey || '';
+        document.getElementById('ollamaUrl').value = settings.ollamaUrl || 'http://localhost:11434';
+        document.getElementById('anthropicApiKey').value = settings.anthropicApiKey || '';
+        document.getElementById('openaiApiKey').value = settings.openaiApiKey || '';
+        document.getElementById('tavilyApiKey').value = settings.tavilyApiKey || '';
+        document.getElementById('groqCustomModelInput').value = settings.groqCustomModel || '';
+        document.getElementById('openrouterCustomModelInput').value = settings.openrouterCustomModel || '';
+        document.getElementById('anthropicCustomModelInput').value = settings.anthropicCustomModel || '';
+        document.getElementById('openaiCustomModelInput').value = settings.openaiCustomModel || '';
+
+        appendCustomOption(document.getElementById('openrouterModel'));
+        appendCustomOption(document.getElementById('anthropicModel'));
+        appendCustomOption(document.getElementById('openaiModel'));
+        ensureSelectValue('openrouterModel', settings.openrouterModel || DEFAULT_OPENROUTER_MODEL);
+        ensureSelectValue('anthropicModel', settings.anthropicModel || DEFAULT_ANTHROPIC_MODEL);
+        ensureSelectValue('openaiModel', settings.openaiModel || DEFAULT_OPENAI_MODEL);
+
+        await refreshGroqModels(settings.groqModel || DEFAULT_GROQ_MODEL);
+
+        modelFieldConfigs.forEach(({ selectId, inputId }) => {
+          syncCustomModelVisibility(document.getElementById(selectId), document.getElementById(inputId));
+        });
+
+        const ollamaSelect = document.getElementById('ollamaModel');
+        ollamaSelect.innerHTML = '';
+        const saved = settings.ollamaModel || DEFAULT_OLLAMA_MODEL;
+        const list = ollamaModels.length ? ollamaModels : [saved];
+        list.forEach((m) => {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = m;
+          if (m === saved) opt.selected = true;
+          ollamaSelect.appendChild(opt);
+        });
+      }
+
+      groqApiKeyInput.addEventListener('change', async () => {
+        latestSettings = await window.desk.saveSettings({
+          ...(latestSettings || {}),
+          ...collectDraftSettings()
+        });
+        await refreshGroqModels((latestSettings && latestSettings.groqModel) || groqModelSelect.value || DEFAULT_GROQ_MODEL);
+      });
+
+      document.getElementById('saveBtn').addEventListener('click', async () => {
+        latestSettings = await window.desk.saveSettings({
+          ...(latestSettings || {}),
+          ...collectDraftSettings()
+        });
+        const status = document.getElementById('status');
+        status.textContent = 'Saved';
+        setTimeout(() => { status.textContent = ''; }, 1800);
+      });
+
+      modelFieldConfigs.forEach(({ selectId, inputId }) => {
+        wireCustomModelToggle(document.getElementById(selectId), document.getElementById(inputId));
+      });
+
+      init();
+    </script>
+  </body>
+</html>

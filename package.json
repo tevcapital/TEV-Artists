@@ -1,0 +1,21 @@
+{
+  "name": "tev-artists",
+  "productName": "TEV Artists",
+  "version": "0.1.0",
+  "description": "Artist critique workstation with persona-based AI committee",
+  "main": "src/main.js",
+  "build": {
+    "appId": "com.tevcapital.tevartists",
+    "productName": "TEV Artists",
+    "artifactName": "${name}-${version}.${ext}"
+  },
+  "dependencies": {
+    "electron-store": "^10.0.1",
+    "mammoth": "^1.10.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "asar": "^3.2.0",
+    "electron": "^41.1.1"
+  }
+}
