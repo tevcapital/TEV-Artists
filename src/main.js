@@ -845,7 +845,7 @@ async function callOpenAI(systemPrompt, messages, model, apiKey, stream = false,
     },
     body: JSON.stringify({
       model,
-      max_tokens: 4096,
+      max_completion_tokens: 4096,
       messages: buildOpenAICompatibleMessages(systemPrompt, messages, image),
       stream
     }),
@@ -969,7 +969,7 @@ async function callGemini(systemPrompt, messages, model, apiKey, stream = false,
         },
         body: JSON.stringify({
           model,
-          max_tokens: 4096,
+          max_completion_tokens: 4096,
           messages: buildOpenAICompatibleMessages(systemPrompt, messages),
           stream: false
         })
